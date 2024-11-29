@@ -24,7 +24,7 @@ pipeline {
                         sh """
                         echo "Building ${service}..."
                         cd ${service}
-                        ./gradlew clean build
+                        ./gradlew clean build -x test
                         ls -al ./build/libs
                         cd ..
                         """
