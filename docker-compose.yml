@@ -12,9 +12,10 @@ services:
       - SPRING_RABBITMQ_PORT=5672
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://13.125.204.207:8888/actuator/health" ]
-      interval: 30s
+      interval: 15s
       timeout: 5s
       retries: 3
+      start_period: 60s
     networks:
       - msa-network
     restart: always
@@ -31,6 +32,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 60s
     restart: always
 
   gateway-service:
