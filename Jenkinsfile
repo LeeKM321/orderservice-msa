@@ -18,10 +18,18 @@ pipeline {
         }
         stage('Build Codes by Gradle') {
             steps {
-                sh """
-                ./gradlew clean build
-                ls -al ./build/libs
-                """
+                script {
+                    def serviceDirs = env.SERVICE_DIRS.split(",")
+                    serviceDirs.each { service ->
+                        sh """
+                        echo "Building ${service}..."
+                        cd ${service}
+                        ./gradlew clean build
+                        ls -al ./build/libs
+                        cd ..
+                        """
+                    }
+                }
             }
         }
         stage('Build Docker Image & Push to AWS ECR') {
@@ -29,7 +37,7 @@ pipeline {
                 script {
                     withAWS(region: "${REGION}", credentials: "aws-key") {
                         def serviceDirs = env.SERVICE_DIRS.split(",")
-                        SERVICE_DIRS.each { service ->
+                        serviceDirs.each { service ->
                             sh """
                             curl -O https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/${ecrLoginHelper}
                             chmod +x ${ecrLoginHelper}
