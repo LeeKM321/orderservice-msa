@@ -99,6 +99,8 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - msa-network
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 
 
 networks:
