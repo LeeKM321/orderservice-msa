@@ -95,8 +95,8 @@ services:
       - "5672:5672" # AMQP 포트
       - "15672:15672" # 관리 UI 포트
     environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - msa-network
 
