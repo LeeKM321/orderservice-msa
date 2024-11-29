@@ -8,6 +8,11 @@ services:
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://13.125.204.207:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - msa-network
     restart: always
@@ -19,6 +24,11 @@ services:
       - "8761:8761"
     networks:
       - msa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://http://13.125.204.207:8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   gateway-service:
@@ -29,8 +39,10 @@ services:
     networks:
       - msa-network
     depends_on:
-      - discovery-service
-      - config-service
+      discovery-service:
+          condition: service_healthy
+      config-service:
+        condition: service_healthy
     restart: always
 
   user-service:
@@ -39,8 +51,10 @@ services:
     networks:
       - msa-network
     depends_on:
-      - discovery-service
-      - config-service
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     restart: always
 
   order-service:
@@ -49,8 +63,10 @@ services:
     networks:
       - msa-network
     depends_on:
-      - discovery-service
-      - config-service
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     restart: always
 
   product-service:
@@ -59,8 +75,10 @@ services:
     networks:
       - msa-network
     depends_on:
-      - discovery-service
-      - config-service
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     restart: always
 
   redis:
