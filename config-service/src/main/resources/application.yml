@@ -27,6 +27,9 @@ spring:
           private-key: |
             ${GIT_PRIVATE_KEY}
 management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
