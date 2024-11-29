@@ -10,7 +10,7 @@ services:
     restart: always
 
   discovery-service:
-    image: 872651651829.dkr.ecr.ap-northeast-2.amazonaws.com/discovery-service:latest # ECR에 push한 이미지 이름
+    image: 872651651829.dkr.ecr.ap-northeast-2.amazonaws.com/discoveryservice:latest # ECR에 push한 이미지 이름
     container_name: discovery-service
     ports:
       - "8761:8761"
@@ -41,7 +41,7 @@ services:
     restart: always
 
   order-service:
-    image: 872651651829.dkr.ecr.ap-northeast-2.amazonaws.com/order-service:latest # ECR에 push한 이미지 이름
+    image: 872651651829.dkr.ecr.ap-northeast-2.amazonaws.com/ordering-service:latest # ECR에 push한 이미지 이름
     container_name: order-service
     networks:
       - msa-network
