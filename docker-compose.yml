@@ -5,6 +5,9 @@ services:
     container_name: config-service
     ports:
       - "8888:8888"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
     networks:
       - msa-network
     restart: always
@@ -64,6 +67,19 @@ services:
     image: redis:latest
     ports:
       - '6379:6379'
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # AMQP 포트
+      - "15672:15672" # 관리 UI 포트
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - msa-network
+
 
 networks:
   msa-network:
