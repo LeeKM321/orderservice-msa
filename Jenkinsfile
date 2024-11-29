@@ -32,6 +32,8 @@ pipeline {
                 }
             }
         }
+
+
         stage('Build Docker Image & Push to AWS ECR') {
             steps {
                 script {
@@ -65,10 +67,13 @@ pipeline {
                 sshagent(credentials: ["jenkins-ssh-key"]) {
                     //
                     sh """
+                    # Jenkins에서 배포 서버로 docker-compose.yml 복사
+                    scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${deployHost}:/home/ubuntu/docker-compose.yml
+
                     ssh -o StrictHostKeyChecking=no ubuntu@${deployHost} \
 
                     # Docker compose 파일이 있는 경로로 이동
-                    cd /home/ubuntu/orderservice-msa && \
+                    cd /home/ubuntu && \
 
                     # 기존 컨테이너 중지 및 제거
                     docker-compose down && \
