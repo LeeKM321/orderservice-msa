@@ -20,13 +20,6 @@ services:
       - msa-network
     volumes:
       - ./ssh:/root/.ssh # 컨테이너 내부 SSH 경로 설정
-    entrypoint: >
-      sh -c "
-        echo \"$GIT_PRIVATE_KEY\" > /root/.ssh/id_ecdsa &&
-        chmod 600 /root/.ssh/id_ecdsa &&
-        ssh-keyscan -H github.com >> /root/.ssh/known_hosts &&
-        java -jar /app/your-app.jar
-      "
     restart: always
 
   discovery-service:
