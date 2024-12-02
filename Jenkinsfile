@@ -33,7 +33,6 @@ pipeline {
             }
         }
 
-
         stage('Build Docker Image & Push to AWS ECR') {
             steps {
                 script {
@@ -62,6 +61,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to AWS EC2 VM') {
             steps {
                 sshagent(credentials: ["jenkins-ssh-key"]) {

@@ -7,19 +7,11 @@ services:
       - "8888:8888"
     env_file:
       - .env
-    volumes:
-      - /root/.ssh:/root/.ssh
-    command: >
-      sh -c "echo \"$GIT_PRIVATE_KEY\" > /root/.ssh/id_rsa &&
-             chmod 600 /root/.ssh/id_rsa &&
-             ssh-keyscan -H github.com >> /root/.ssh/known_hosts &&
-             java -jar app.jar"
-
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://13.125.204.207:8888/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "http://43.203.99.76:8888/actuator/health" ]
       interval: 15s
       timeout: 5s
       retries: 3
@@ -36,8 +28,8 @@ services:
     networks:
       - msa-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://http://13.125.204.207:8761"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://43.203.99.76:8761"]
+      interval: 15s
       timeout: 5s
       retries: 5
       start_period: 60s
@@ -52,7 +44,7 @@ services:
       - msa-network
     depends_on:
       discovery-service:
-          condition: service_healthy
+        condition: service_healthy
       config-service:
         condition: service_healthy
     restart: always
