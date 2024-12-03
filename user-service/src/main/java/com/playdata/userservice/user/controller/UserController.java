@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,6 +38,9 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final Environment env;
 
+    @Value("${jwt.expiration}")
+    private Long expiration;
+
     @Qualifier("user-template") // RedisTemplate이 여러 개 빈 등록되었을 경우 명시한다.
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -52,6 +56,10 @@ public class UserController {
 
     @PostMapping("/doLogin")
     public ResponseEntity<?> doLogin(@RequestBody UserLoginReqDto dto) {
+
+        log.info("doLogin: POST, dto: {}", dto);
+        log.info("jwt expiration: {}", expiration);
+
         // email, password가 맞는 지 검증
         User user = userService.login(dto);
 

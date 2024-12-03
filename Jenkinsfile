@@ -16,11 +16,34 @@ pipeline {
                 checkout scm // 젠킨스와 연결된 소스 컨트롤 매니저(git 등)에서 코드를 가져오는 명령어
             }
         }
-        stage('Build Codes by Gradle') {
+        stage('Detect Changes') {
             steps {
                 script {
+                    // 변경된 파일 감지
+                    def changedFiles = sh(script: "git diff --name-only HEAD HEAD~1", returnStdout: true).trim().split('\n')
+                    def changedServices = []
                     def serviceDirs = env.SERVICE_DIRS.split(",")
+
                     serviceDirs.each { service ->
+                        if (changedFiles.any { it.startsWith(service + "/") }) {
+                            changedServices.add(service)
+                        }
+                    }
+
+                    env.CHANGED_SERVICES = changedServices.join(",")
+                    if (env.CHANGED_SERVICES == "") {
+                        echo "No changes detected in service directories. Skipping build and deployment."
+                        currentBuild.result = 'SUCCESS'
+                        error("No changes detected")
+                    }
+                }
+            }
+        }
+        stage('Build Changed Services') {
+            steps {
+                script {
+                    def changedServices = env.CHANGED_SERVICES.split(",")
+                    changedServices.each { service ->
                         sh """
                         echo "Building ${service}..."
                         cd ${service}
@@ -32,6 +55,29 @@ pipeline {
                 }
             }
         }
+        stage('Build Docker Image & Push to AWS ECR') {
+            steps {
+                script {
+                    withAWS(region: "${REGION}", credentials: "aws-key") {
+                        def changedServices = env.CHANGED_SERVICES.split(",")
+                        changedServices.each { service ->
+                            sh """
+                            curl -O https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/${ecrLoginHelper}
+                            chmod +x ${ecrLoginHelper}
+                            mv ${ecrLoginHelper} /usr/local/bin/
+
+                            echo '{"credHelpers": {"${ECR_URL}": "ecr-login"}}' > ~/.docker/config.json
+
+                            docker build -t ${service}:latest ${service}
+                            docker tag ${service}:latest ${ECR_URL}/${service}:latest
+                            docker push ${ECR_URL}/${service}:latest
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
 
         stage('Build Docker Image & Push to AWS ECR') {
             steps {
@@ -62,27 +108,21 @@ pipeline {
             }
         }
 
-        stage('Deploy to AWS EC2 VM') {
+        stage('Deploy Changed Services to AWS EC2 VM') {
             steps {
                 sshagent(credentials: ["jenkins-ssh-key"]) {
-                    //
                     sh """
                     # Jenkins에서 배포 서버로 docker-compose.yml 복사
                     scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${deployHost}:/home/ubuntu/docker-compose.yml
 
                     ssh -o StrictHostKeyChecking=no ubuntu@${deployHost} '
-
-                    # Docker compose 파일이 있는 경로로 이동
                     cd /home/ubuntu && \
 
-                    # 기존 컨테이너 중지 및 제거
-                    docker-compose down && \
-
+                    # 기존 컨테이너 중지 및 변경된 컨테이너만 업데이트
                     aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URL} && \
 
-                    # Docker Compose로 컨테이너 재배포
-                    docker-compose pull && \
-                    docker-compose up -d
+                    docker-compose pull ${env.CHANGED_SERVICES} && \
+                    docker-compose up -d ${env.CHANGED_SERVICES}
                     '
                     """
                 }
