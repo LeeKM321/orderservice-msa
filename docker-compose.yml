@@ -18,6 +18,9 @@ services:
       start_period: 60s
     networks:
       - msa-network
+    depends_on:
+      discovery-service:
+        condition: service_healthy
     restart: always
 
   discovery-service:
