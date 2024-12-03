@@ -54,9 +54,9 @@ public class SecurityConfig {
                     .requestMatchers("/create", "/doLogin",
                             "/refresh", "/", "/findByEmail",
                             "/users/email", "/health-check").permitAll()
-                    .requestMatchers("/**").access(
-                            new WebExpressionAuthorizationManager("hasIpAddress('localhost') or hasIpAddress('::1') or hasIpAddress('127.0.0.1')  or hasIpAddress('172.30.67.125')")
-                    )
+//                    .requestMatchers("/**").access(
+//                            new WebExpressionAuthorizationManager("hasIpAddress('localhost') or hasIpAddress('::1') or hasIpAddress('127.0.0.1')  or hasIpAddress('172.30.67.125')")
+//                    )
                     .anyRequest().authenticated();
         })
                 // 커스텀 필터를 등록.
