@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     // 변경된 파일 감지
-                    def changedFiles = sh(script: "git diff --name-only origin/main HEAD", returnStdout: true)
+                    def changedFiles = sh(script: "git fetch origin main && git diff --name-only FETCH_HEAD HEAD", returnStdout: true)
                         .trim()
                         .split('\n')
                     def changedServices = []
