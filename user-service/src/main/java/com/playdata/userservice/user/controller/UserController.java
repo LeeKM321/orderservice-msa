@@ -58,7 +58,7 @@ public class UserController {
     public ResponseEntity<?> doLogin(@RequestBody UserLoginReqDto dto) {
 
         log.info("doLogin: POST, dto: {}", dto);
-        log.info("jwt expiration 변경 - 1: {}", expiration);
+        log.info("jwt expiration 변경 - 2: {}", expiration);
 
         // email, password가 맞는 지 검증
         User user = userService.login(dto);
