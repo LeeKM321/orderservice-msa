@@ -20,7 +20,9 @@ pipeline {
             steps {
                 script {
                     // 변경된 파일 감지
-                    def changedFiles = sh(script: "git diff --name-only HEAD HEAD~1", returnStdout: true).trim().split('\n')
+                    def changedFiles = sh(script: "git diff --name-only origin/main HEAD", returnStdout: true)
+                        .trim()
+                        .split('\n')
                     def changedServices = []
                     def serviceDirs = env.SERVICE_DIRS.split(",")
 
@@ -33,8 +35,8 @@ pipeline {
                     env.CHANGED_SERVICES = changedServices.join(",")
                     if (env.CHANGED_SERVICES == "") {
                         echo "No changes detected in service directories. Skipping build and deployment."
-                        currentBuild.result = 'SUCCESS'
-                        error("No changes detected")
+                        currentBuild.result = 'SUCCESS' // 빌드를 성공으로 표시
+                        return // 이후 단계를 건너뛰기
                     }
                 }
             }
