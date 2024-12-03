@@ -9,7 +9,6 @@ pipeline {
         REGION = "ap-northeast-2"
         ECR_URL = "872651651829.dkr.ecr.ap-northeast-2.amazonaws.com"
         SERVICE_DIRS = "config-service,discoveryservice,gateway-service,user-service,ordering-service,product-service"
-        SKIP_PIPELINE = false // 파이프라인 전체 실행 여부를 제어하는 플래그
     }
     stages {
         stage('Pull Codes from Github'){ // 스테이지 제목 (맘대로 써도 됨.)
@@ -37,16 +36,15 @@ pipeline {
                     if (env.CHANGED_SERVICES == "") {
                         echo "No changes detected in service directories. Skipping build and deployment."
                         // 성공 상태로 파이프라인 종료
-                    env.SKIP_PIPELINE = true // 플래그를 설정하여 이후 스테이지를 건너뛰도록 설정
+                        currentBuild.result = 'SUCCESS' // 성공으로 표시
                     }
                 }
             }
         }
         stage('Build Changed Services') {
             when {
-                expression { !env.SKIP_PIPELINE.toBoolean() } // 플래그가 false일 때만 실행
+                expression { env.CHANGED_SERVICES != "" } // 변경된 서비스가 있을 때만 실행
             }
-
             steps {
                 script {
                     def changedServices = env.CHANGED_SERVICES.split(",")
@@ -63,10 +61,9 @@ pipeline {
             }
         }
         stage('Build Docker Image & Push to AWS ECR') {
-            when {
-                expression { !env.SKIP_PIPELINE.toBoolean() } // 플래그가 false일 때만 실행
-            }
-
+           when {
+               expression { env.CHANGED_SERVICES != "" } // 변경된 서비스가 있을 때만 실행
+           }
             steps {
                 script {
                     withAWS(region: "${REGION}", credentials: "aws-key") {
@@ -91,7 +88,7 @@ pipeline {
 
         stage('Deploy Changed Services to AWS EC2 VM') {
             when {
-                expression { !env.SKIP_PIPELINE.toBoolean() } // 플래그가 false일 때만 실행
+                expression { env.CHANGED_SERVICES != "" } // 변경된 서비스가 있을 때만 실행
             }
 
             steps {
