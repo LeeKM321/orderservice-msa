@@ -13,22 +13,20 @@ pipeline {
     stages {
         stage('Pull Codes from Github'){ // 스테이지 제목 (맘대로 써도 됨.)
             steps{
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'CloneOption', noTags: false, depth: 0, shallow: false]],
-                    userRemoteConfigs: [[url: 'git@github.com:LeeKM321/orderservice-msa.git', credentialsId: 'jenkins-ssh-key']]
-                ])
+                checkout scm // 젠킨스와 연결된 소스 컨트롤 매니저(git 등)에서 코드를 가져오는 명령어
             }
         }
         stage('Detect Changes') {
             steps {
                 script {
                     // 변경된 파일 감지
-                    def changedFiles = sh(script: "git fetch origin main && git diff --name-only FETCH_HEAD HEAD", returnStdout: true)
+                    def changedFiles = sh(script: "git diff --name-only HEAD~1 HEAD", returnStdout: true)
                         .trim()
-                        .split('\n')
+                        .split('\n') // 변경된 파일을 줄 단위로 분리
+
+                    // 변경된 파일 출력
+                    echo "Changed files: ${changedFiles}"
+
                     def changedServices = []
                     def serviceDirs = env.SERVICE_DIRS.split(",")
 
