@@ -7,6 +7,8 @@ spring:
 
 # 유레카 클라이언트 설정 - 자신은 등록에서 제외.
 eureka:
+  instance:
+    hostname: discovery-service
   client:
     register-with-eureka: false
     fetch-registry: false
