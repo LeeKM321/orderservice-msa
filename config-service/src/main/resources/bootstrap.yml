@@ -4,3 +4,9 @@ encrypt:
     location: file:///Users/stephen/keystore/apiEncryptionKey.jks
     password: abc1234
     alias: apiEncryptionKey
+
+spring:
+  cloud:
+    config:
+      uri: http://config-service:8888
+      profile: default

@@ -1,7 +1,5 @@
 spring:
   cloud:
     config:
-      uri: http://localhost:8888
-      name: orderservice
-  profiles:
-    active: prod
+      uri: http://config-service:8888
+      profile: default

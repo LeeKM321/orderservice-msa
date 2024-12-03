@@ -39,6 +39,9 @@ dependencies {
     // Spring Cloud 환경에서 server to server 요청을 처리해 주는 feign client 라이브러리
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+
+
 
     // 쿼리 파라미터 추가 외부 로그 남기기
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'

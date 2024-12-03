@@ -4,12 +4,6 @@ server:
 spring:
   application:
     name: config-service
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: guest
-    password: guest
-  # ??? ???? ??
   cloud:
     config:
       server:
@@ -25,14 +19,6 @@ spring:
           private-key: |
             ${GIT_PRIVATE_KEY}
 
-management:
-  endpoint:
-    health:
-      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: refresh, health, beans, busrefresh
 logging:
   level:
     org.springframework.cloud.config: debug
