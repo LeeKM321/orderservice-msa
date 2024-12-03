@@ -35,8 +35,10 @@ pipeline {
                     env.CHANGED_SERVICES = changedServices.join(",")
                     if (env.CHANGED_SERVICES == "") {
                         echo "No changes detected in service directories. Skipping build and deployment."
-                        currentBuild.result = 'SUCCESS' // 빌드를 성공으로 표시
-                        return // 이후 단계를 건너뛰기
+                        // 성공 상태로 파이프라인 종료
+                        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+                            error("No changes detected. Exiting pipeline.")
+                        }
                     }
                 }
             }
