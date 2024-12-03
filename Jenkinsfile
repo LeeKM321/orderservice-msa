@@ -78,36 +78,6 @@ pipeline {
             }
         }
 
-
-        stage('Build Docker Image & Push to AWS ECR') {
-            steps {
-                script {
-                    withAWS(region: "${REGION}", credentials: "aws-key") {
-                        def serviceDirs = env.SERVICE_DIRS.split(",")
-                        serviceDirs.each { service ->
-                            sh """
-                            curl -O https://amazon-ecr-credential-helper-releases.s3.us-east-2.amazonaws.com/0.4.0/linux-amd64/${ecrLoginHelper}
-                            chmod +x ${ecrLoginHelper}
-                            mv ${ecrLoginHelper} /usr/local/bin/
-
-                            echo '{"credHelpers": {"${ECR_URL}": "ecr-login"}}' > ~/.docker/config.json
-
-
-                            # Docker 이미지 빌드 (서비스 이름으로)
-                            docker build -t ${service}:latest ${service}
-
-                            # ECR 레포지토리로 태깅
-                            docker tag ${service}:latest ${ECR_URL}/${service}:latest
-
-                            # ECR로 푸시
-                            docker push ${ECR_URL}/${service}:latest
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Deploy Changed Services to AWS EC2 VM') {
             steps {
                 sshagent(credentials: ["jenkins-ssh-key"]) {
