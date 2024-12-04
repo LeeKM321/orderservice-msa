@@ -10,3 +10,7 @@ spring:
     name: user-service
 
 
+temp:
+  message: hellojava!
+
+
