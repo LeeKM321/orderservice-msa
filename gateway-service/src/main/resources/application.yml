@@ -11,7 +11,7 @@ spring:
         cors-configurations:
           "[/**]": # 모든 경로에 대한 CORS 설정
             allowed-origins:
-              - "http://localhost:3000"
+              - "http://playdatashop8917.shop"
             allowed-methods:
               - GET
               - POST
