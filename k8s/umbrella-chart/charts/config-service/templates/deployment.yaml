@@ -1,0 +1,51 @@
+# Helm 템플릿에서 사용되는 Deployment 리소스 정의 템플릿.
+# values.yml에 있는 변수들을 끌고와서 동적으로 Deployment들을 생성할 예정.
+
+# .Values -> values.yml 파일을 지목, services라는 이름의 목록을 순회하겠다.
+# $ -> Helm의 전역 범위를 참조.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-service
+  labels:
+    app: config-service
+  annotations:
+    "helm.sh/hook": pre-install, post-install
+    "helm.sh/hook-weight": "-5" # RabbitMQ보다 늦게 실행
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: config-service
+  template:
+    metadata:
+      labels:
+        app: config-service
+    spec:
+      imagePullSecrets:
+        {{- if .Values.imagePullSecrets }}
+        {{- range .Values.imagePullSecrets }}
+        - name: {{ . | quote }}
+        {{- end }}
+        {{- end }}
+      containers:
+        - name: config-service
+          image: {{ .Values.image }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8888
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.env.SPRING_PROFILES_ACTIVE }}
+            - name: GIT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: git-private-key
+                  key: GIT_PRIVATE_KEY

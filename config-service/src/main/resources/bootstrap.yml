@@ -6,6 +6,9 @@ encrypt:
     alias: apiEncryptionKey
 
 spring:
+  rabbitmq:
+    host: rabbitmq-service.default.svc.cluster.local
+    port: 5672
   cloud:
     config:
       uri: http://config-service:8888

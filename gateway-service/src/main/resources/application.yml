@@ -1,4 +1,3 @@
-
 server:
   port: 8000
 
@@ -9,9 +8,9 @@ spring:
     gateway:
       globalcors:
         cors-configurations:
-          "[/**]": # 모든 경로에 대한 CORS 설정
+          '[/**]': # 모든 경로에 대한 CORS 설정
             allowed-origins:
-              - "https://playdatashop8917.shop"
+              - 'https://playdatashop8917.shop'
             allowed-methods:
               - GET
               - POST
@@ -19,9 +18,9 @@ spring:
               - DELETE
               - OPTIONS
             allowed-headers:
-              - "Content-Type"
-              - "Authorization"
-              - "X-Requested-With"
+              - 'Content-Type'
+              - 'Authorization'
+              - 'X-Requested-With'
             allow-credentials: true
       default-filters:
         - name: GlobalFilter
@@ -35,7 +34,7 @@ spring:
             strategy: RETAIN_FIRST
       routes:
         - id: user-service
-          uri: lb://USER-SERVICE
+          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
             - Path=/user-service/doLogin
             - Method=POST
@@ -44,7 +43,7 @@ spring:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
         - id: user-service
-          uri: lb://USER-SERVICE
+          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
             - Path=/user-service/actuator/**
             - Method=GET, POST
@@ -53,7 +52,7 @@ spring:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
         - id: user-service
-          uri: lb://USER-SERVICE
+          uri: http://user-service.default.svc.cluster.local:8081
           predicates:
             - Path=/user-service/**
           filters:
@@ -61,11 +60,11 @@ spring:
             - RemoveRequestHeader=Cookie
             # 요청 경로를 특정 패턴에 따라 새로운 경로로 변환 -> 정규표현식 사용 가능 (자유도 높음)
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
-#            - StripPrefix=1 -> 첫번째 접두어를 제거
+            #            - StripPrefix=1 -> 첫번째 접두어를 제거
             - AuthorizationHeaderFilter
 
         - id: product-service
-          uri: lb://PRODUCT-SERVICE
+          uri: http://product-service.default.svc.cluster.local:8083
           predicates:
             - Path=/product-service/**
           filters:
@@ -74,7 +73,7 @@ spring:
             - AuthorizationHeaderFilter
 
         - id: ordering-service
-          uri: lb://ORDERING-SERVICE
+          uri: http://ordering-service.default.svc.cluster.local:8082
           predicates:
             - Path=/ordering-service/**
           filters:
@@ -87,7 +86,7 @@ spring:
           predicates:
             - Path=/first-service/**
           filters:
-#            - AddRequestHeader=first-request, first-request-value
+            #            - AddRequestHeader=first-request, first-request-value
             - CustomFilter
 
         - id: second-service
@@ -95,11 +94,10 @@ spring:
           predicates:
             - Path=/second-service/**
           filters:
-#            - AddRequestHeader=second-request, second-request-value
+            #            - AddRequestHeader=second-request, second-request-value
             - name: CustomFilter
             - name: LoggerFilter
               args:
                 baseMessage: hi there
                 preLogger: true
                 postLogger: true
-

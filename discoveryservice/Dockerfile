@@ -1,9 +1,6 @@
 # Base 이미지
 FROM openjdk:17-jdk-slim
 
-# curl 설치
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
 COPY build/libs/*.jar /app.jar
 
 # 애플리케이션 실행 명령

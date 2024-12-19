@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "product-service")
+@FeignClient(name = "product-service", url = "http://product-service.default.svc.cluster.local:8083")
 public interface ProductServiceClient {
 
     @GetMapping("/{prodId}/prod")

@@ -1,0 +1,10 @@
+global:
+  imagePullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-secret
+
+# github의 secret token은 eks 내의 secret 값으로 직접 세팅하기.
+# kubectl create secret generic git-private-key \
+#   --from-literal=GIT_PRIVATE_KEY=<your-github-token> \
+#   --namespace=default

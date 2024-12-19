@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "user-service") // 호출하고자 하는 서비스의 이름 (유레카에 등록된)
+@FeignClient(name = "user-service", url = "http://user-service.default.svc.cluster.local:8081")
 public interface UserServiceClient {
 
     @GetMapping("/findByEmail")
